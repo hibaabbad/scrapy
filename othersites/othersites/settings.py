@@ -17,7 +17,7 @@ NEWSPIDER_MODULE = "othersites.spiders"
 #USER_AGENT = "othersites (+http://www.yourdomain.com)"
 
 # Obey robots.txt rules
-ROBOTSTXT_OBEY = True
+ROBOTSTXT_OBEY = False
 ## settings.py
 
 DOWNLOAD_DELAY = 0.5
@@ -79,6 +79,7 @@ DOWNLOADER_MIDDLEWARES = {
 ITEM_PIPELINES = {
     'othersites.pipelines.PricePipeline': 100,
     'othersites.pipelines.DuplicatesPipeline': 200,
+    'othersites.pipelines.MysqlDemoPipeline': 300,
 }
 
 # Enable and configure the AutoThrottle extension (disabled by default)

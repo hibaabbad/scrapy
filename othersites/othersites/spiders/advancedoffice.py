@@ -23,7 +23,6 @@ class AdvancedofficeSpider(scrapy.Spider):
                     yield response.follow(next_page, callback=self.parse)
        
     def parse_pc_page(self, response):
-        print(self)
         product = response.css('div.product-essential')
         item = OthersitesLoader(item=OthersitesItem(), selector=product)
         item.add_css('name', "div.product-name h1::text")

@@ -22,10 +22,14 @@ class JumiaspiderSpider(scrapy.Spider):
         item.add_css('name', "div.-pls h1::text")
         item.add_value('url',product_url)
         item.add_css('photo',"div.itm img::attr(data-src)")
-        item.add_css('marque',"a._more::text")
+        item.add_css('brand',"a._more::text")
         item.add_css('price',"div.df span::text")
         item.add_css('description',"div.markup p::text")
-        item.add_value('type',"Laptops")
+        item.add_value('type',"Laptops"),
+        item.add_value('source',"jumia"),
+        item.add_value('address',None),
+        item.add_value('status',"New")
+        
         
         # Extract the <ul> element
         ul_element = response.css('div.markup ul')
@@ -35,13 +39,13 @@ class JumiaspiderSpider(scrapy.Spider):
         for li_text in li_texts:
             cleaned_li_text = li_text.strip()
             if 'disque' in cleaned_li_text.lower():
-                item.add_value('disque',cleaned_li_text)
+                item.add_value('disk',cleaned_li_text)
             elif 'ram' in cleaned_li_text.lower():
                 item.add_value('ram',cleaned_li_text)
             elif ('processeur' in cleaned_li_text.lower()) or ('cpu' in cleaned_li_text.lower()) :  
                 item.add_value('cpu',cleaned_li_text)
             elif 'ecran' in cleaned_li_text.lower():
-                item.add_value('ecran',cleaned_li_text)
+                item.add_value('screen',cleaned_li_text)
         yield item.load_item()
 
       

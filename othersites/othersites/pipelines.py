@@ -13,18 +13,22 @@ import re
 
 class PricePipeline:
 
-    def process_item(self, item, spider):
-        # Remove commas and currency symbol from the 'price' attribute
-        price_str = re.sub(r'[^\d.]', '', item['price'])
-        
-        # Convert the cleaned 'price' to a float
-        try:
-            item['price'] = float(price_str)
-        except ValueError:
-            # Handle the case where conversion fails (e.g., if 'price' is not a valid number)
-            item['price'] = None  # You can set a default value or handle it accordingly
+   def process_item(self, item, spider):
+        adapter = ItemAdapter(item)
 
-        # Rest of your processing logic...
+        # Check if 'price' key is present in the item
+        if 'price' in adapter:
+            # Remove commas and currency symbol from the 'price' attribute
+            price_str = re.sub(r'[^\d.]', '', adapter['price'])
+
+            # Convert the cleaned 'price' to a float
+            try:
+                adapter['price'] = float(price_str)
+            except ValueError:
+                # Handle the case where conversion fails (e.g., if 'price' is not a valid number)
+                adapter['price'] = None  # You can set a default value or handle it accordingly
+        else:
+            spider.logger.warning("Item does not have 'price' field.")
 
         return item
         
@@ -68,11 +72,15 @@ class MysqlDemoPipeline:
                 photo TEXT,
                 description TEXT,
                 type VARCHAR(255),
-                disque VARCHAR(255),
+                disk VARCHAR(255),
                 ram VARCHAR(255),
                 cpu VARCHAR(255),
-                marque VARCHAR(255),
-                ecran VARCHAR(255)
+                brand VARCHAR(255),
+                screen VARCHAR(255),
+                source VARCHAR(255),
+                address VARCHAR(255),
+                status VARCHAR(255)
+                
             )
             """)
         
@@ -80,8 +88,8 @@ class MysqlDemoPipeline:
         try:
             # Define insert statement for laptops table
             insert_query = """
-                INSERT INTO laptops (name, price, url, photo, description, type, disque, ram, cpu, marque, ecran)
-                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                INSERT INTO laptops (name, price, url, photo, description, type, disk, ram, cpu, brand, screen, source, address, status)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
             """
             
 
@@ -94,11 +102,15 @@ class MysqlDemoPipeline:
                     item.get('photo', None),
                     item.get('description', None),
                     item['type'],
-                    item.get('disque', None),
+                    item.get('disk', None),
                     item.get('ram', None),
                     item.get('cpu', None),
-                    item['marque'],
-                    item.get('ecran', None)
+                    item.get('brand', None),
+                    item.get('screen', None),
+                    item.get('source', None),
+                    item.get('address', None),
+                    item.get('status', None)
+                    
                 ))
 
         except mysql.connector.Error as err:

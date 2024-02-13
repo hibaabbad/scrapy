@@ -12,7 +12,7 @@ class AdvancedofficeSpider(scrapy.Spider):
        products = response.css('li.item')
        for product in products:
            product_url = product.css('div.product-name a::attr(href)').get()
-           yield scrapy.Request(product_url, callback=self.parse_pc_page)
+           yield scrapy.Request(product_url, callback=self.parse_pc_page,meta={'product_url': product_url})
            
        next_pages = response.css('div.pagination li a::attr(href)').getall()
        for next_page in next_pages:
@@ -23,28 +23,31 @@ class AdvancedofficeSpider(scrapy.Spider):
                     yield response.follow(next_page, callback=self.parse)
        
     def parse_pc_page(self, response):
-        product = response.css('div.product-essential')
+        product_url = response.meta.get('product_url',''),
+        product = response.css('div.product-essential'),
         item = OthersitesLoader(item=OthersitesItem(), selector=product)
-        item.add_css('name', "div.product-name h1::text")
-        item.add_css('url',"")
-        item.add_css('photo',"div.product-image-zoom a::attr(href)")
-        item.add_css('price', 'replace_this_with_actual_css_selector_for_price')
-        item.add_css('description',"ul.breadcrumbs li.product span::text")
-        item.add_css('type',"ul.breadcrumbs li:nth-last-child(2) span::text")
+        item.add_css('name', "div.product-name h1::text"),
+        item.add_value('url',product_url),
+        item.add_css('photo',"div.product-image-zoom a::attr(href)"),
+        item.add_css('price', ''),
+        item.add_css('description',"ul.breadcrumbs li.product span::text"),
+        item.add_css('type',"ul.breadcrumbs li:nth-last-child(2) span::text"),
+        item.add_value('source',"advanced-office"),
+        item.add_value('status',"New"),
         rows = response.css('table tr')
         for row in rows:
             td1=row.css('td:first-child::text').get()
             td2_content = row.css('td:nth-child(2)::text').get()
             if td1=='Disque dur':
-                item.add_css('disque',td2_content)
+                item.add_css('disk',td2_content)
             elif td1=='Mémoire vive':
                 item.add_css('ram',td2_content)
             elif td1=='Processeur':  
                 item.add_css('cpu',td2_content)
             elif td1=='Marque':
-                item.add_css('marque',td2_content)
+                item.add_css('brand',td2_content)
             elif td1=='Ecran':
-                item.add_css('ecran',td2_content)
+                item.add_css('screen',td2_content)
         yield item.load_item()
 
       
